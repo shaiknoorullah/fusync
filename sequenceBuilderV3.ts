@@ -591,7 +591,7 @@ const runSequence = async (useRedis: boolean = false) => {
         queueType: 'FIFO',
         useRedis: useRedis,
         redisOptions: useRedis ? { host: 'localhost', port: 6379 } : undefined,
-        concurrency: 3
+        concurrency: 1
     });
 
     sequence.context = {
