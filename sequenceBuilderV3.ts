@@ -220,35 +220,6 @@ class AdvancedSequenceBuilder {
         return this;
     }
 
-    // async build(): Promise<void> {
-    //     this.executionStart = Date.now();
-    //     this.log('info', `Starting sequence execution (${this.config.useRedis ? 'Redis' : 'In-Memory'} mode)`);
-    //     return new Promise((resolve, reject) => {
-    //         tracer.startActiveSpan('Build Sequence', async (span) => {
-    //             try {
-    //                 const sortedLayers = this.topologicalSort();
-    //                 await this.executeLayersInOrder(sortedLayers);
-    //                 span.setStatus({ code: opentelemetry.SpanStatusCode.OK });
-    //                 this.logMetrics();
-    //                 resolve();
-    //             } catch (error) {
-    //                 span.setStatus({
-    //                     code: opentelemetry.SpanStatusCode.ERROR,
-    //                     message: error instanceof Error ? error.message : 'Unknown error'
-    //                 });
-    //                 reject(error);
-    //             } finally {
-    //                 span.end();
-    //                 if (this.worker) {
-    //                     await this.worker.close();
-    //                 }
-    //                 if (this.queue instanceof Queue) {
-    //                     await this.queue.close();
-    //                 }
-    //             }
-    //         });
-    //     });
-    // }
 
     async build(): Promise<void> {
         this.executionStart = Date.now();
@@ -316,44 +287,6 @@ class AdvancedSequenceBuilder {
         });
     }
 
-
-
-    // private async executeLayersInOrder(sortedLayers: string[]): Promise<void> {
-    //     const executionPromises = new Map<string, Promise<void>>();
-
-    //     const executeLayer = async (layerName: string) => {
-    //         const dependencies = this.dependencies.get(layerName) || new Set();
-    //         await Promise.all(Array.from(dependencies).map(dep => executionPromises.get(dep)));
-
-    //         if (this.config.useRedis) {
-    //             await this.queue.add(layerName, { layerName, args: this.layers.get(layerName)?.args }, {
-    //                 jobId: layerName,
-    //                 attempts: this.layers.get(layerName)?.retries || 3,
-    //                 backoff: {
-    //                     type: 'exponential',
-    //                     delay: 1000,
-    //                 },
-    //             });
-    //         } else {
-    //             await this.processJob({ name: layerName, data: { layerName } } as Job);
-    //         }
-    //     };
-
-    //     const layerPromises = sortedLayers.map(layerName => {
-    //         const promise = executeLayer(layerName);
-    //         executionPromises.set(layerName, promise);
-    //         return promise;
-    //     });
-
-    //     await Promise.all(layerPromises);
-
-    //     if (this.config.useRedis) {
-    //         await this.queue.waitUntilReady();
-    //         await new Promise<void>(resolve => {
-    //             this.worker!.on('drained', resolve);
-    //         });
-    //     }
-    // }
 
     private async executeLayersInOrder(sortedLayers: string[]): Promise<void> {
         const executionPromises = new Map<string, Promise<void>>();
