@@ -15,6 +15,11 @@
     - [Asynchronous Tasks](#asynchronous-tasks)
   - [Task Dependencies](#task-dependencies)
     - [Dependency Rules](#dependency-rules)
+  - [Sequences and Layers](#sequences-and-layers)
+    - [Sequence](#sequence)
+    - [Layer](#layer)
+    - [Queue](#queue)
+    - [Dynamic Execution Across Layers](#dynamic-execution-across-layers)
   - [Diagrams](#diagrams)
     - [Task Dependency Graph](#task-dependency-graph)
     - [Concurrent Execution Flow](#concurrent-execution-flow)
@@ -174,6 +179,35 @@ A task **depends** on another task if:
 - Tasks that require artifacts from other tasks.
 - Tasks that rely on variables modified by other tasks.
 
+## Sequences and Layers
+
+### Sequence
+
+A Sequence represents a complete business logic flow, consisting of multiple Layers. It orchestrates the execution of Layers and manages the overall flow of the task execution system.
+
+### Layer
+
+A Layer is a group of tasks or queues that can be executed concurrently within the Sequence. Layers are determined based on the topological sorting of the dependency graph.
+
+- Each Layer may contain multiple concurrent queues.
+- Tasks within a Layer are at the same depth level in the dependency graph.
+- Layers provide a logical grouping for tasks with similar dependencies and execution priorities.
+
+### Queue
+
+A Queue is a series of tasks within a Layer that must be executed sequentially due to their dependencies.
+
+- Multiple Queues within a Layer can be executed concurrently.
+- The number of concurrent Queues is limited by the `maxConcurrency` setting.
+
+### Dynamic Execution Across Layers
+
+While Layers provide a logical grouping, the execution engine allows for dynamic progression across Layers:
+
+- If a Queue in one Layer completes before others in the same Layer, dependent tasks in subsequent Layers can begin execution immediately.
+- This approach prevents bottlenecks and maximizes resource utilization.
+- The system respects both the dependency graph and the `maxConcurrency` limit while allowing this flexible execution model.
+
 ## Diagrams
 
 ### Task Dependency Graph
@@ -234,9 +268,10 @@ We use a **Directed Acyclic Graph (DAG)** to model task dependencies:
 The execution strategy is designed to:
 
 - **Identify Independent Tasks**: Tasks with no dependencies.
-- **Form Queues**: Group tasks into linear sequences based on dependencies.
-- **Enable Concurrency**: Execute independent queues concurrently.
+- **Form Layers and Queues**: Group tasks into Layers based on their depth in the dependency graph, and further into Queues within each Layer.
+- **Enable Concurrency**: Execute independent Queues concurrently within and across Layers.
 - **Ensure Correctness**: Execute tasks in an order that respects dependencies.
+- **Optimize Resource Usage**: Allow dynamic execution across Layers to prevent bottlenecks.
 
 ## Algorithm Steps
 
