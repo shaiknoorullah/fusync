@@ -23,9 +23,17 @@ A powerful library for managing and executing complex sequences of asynchronous 
 10. [OpenTelemetry Integration](#opentelemetry-integration)
 11. [Redis Integration](#redis-integration)
 12. [Best Practices](#best-practices)
-13. [Contributing](#contributing)
-14. [License](#license)
-15. [Contact](#contact)
+13. [Conceptual Theory](#conceptual-theory)
+    - [Definitions](#definitions)
+    - [Types of Tasks](#types-of-tasks)
+    - [Task Dependencies](#task-dependencies)
+    - [Sequences and Layers](#sequences-and-layers)
+    - [Algorithm Overview](#algorithm-overview)
+    - [Complexity Analysis](#complexity-analysis)
+14. [Implementation Examples](#implementation-examples)
+15. [Contributing](#contributing)
+16. [License](#license)
+17. [Contact](#contact)
 
 ## Problem Statement
 
@@ -275,6 +283,135 @@ For distributed systems, Fusync offers Redis-based queue management:
 3. **Timeouts**: Consider adding timeouts to long-running tasks to prevent bottlenecks.
 4. **Monitoring**: Utilize the built-in metrics and OpenTelemetry integration for comprehensive monitoring.
 5. **Testing**: Create unit tests for individual tasks and integration tests for sequences.
+
+## Conceptual Theory
+
+### Definitions
+
+- **Task**: The fundamental unit of work, consisting of parameters, an action, and an optional artifact.
+- **Parameters**: Input variables required for task execution.
+- **Action**: The operation that the task performs (synchronous or asynchronous).
+- **Artifact**: The output or return value produced by a task.
+
+### Types of Tasks
+
+- **Synchronous Tasks**: Executed sequentially.
+- **Asynchronous Tasks**: Executed independently, allowing concurrent execution.
+
+### Task Dependencies
+
+Tasks may have dependencies based on their parameters and the variables they modify. A task depends on another task if:
+1. It requires the artifact produced by the parent task.
+2. It relies on a variable that the parent task modifies.
+
+### Sequences and Layers
+
+- **Sequence**: Represents a complete business logic flow, consisting of multiple Layers.
+- **Layer**: A group of tasks or queues that can be executed concurrently within the Sequence.
+- **Queue**: A series of tasks within a Layer that must be executed sequentially due to their dependencies.
+
+### Algorithm Overview
+
+1. **Task Representation**: Each task is an object with an ID, parameters, action, artifact, and dependencies.
+2. **Dependency Graph Construction**: Use a Directed Acyclic Graph (DAG) to model task dependencies.
+3. **Execution Strategy**: 
+   - Identify independent tasks
+   - Form layers and queues
+   - Enable concurrency
+   - Ensure correctness
+   - Optimize resource usage
+
+### Complexity Analysis
+
+- **Time Complexity**:
+  - Building Dependency Graph: O(V + E) or O(V^2)
+  - Topological Sorting: O(V + E)
+  - Queue Formation: O(V + E)
+  - Task Execution: Dependent on task durations
+- **Space Complexity**: O(V + E)
+
+Where V is the number of tasks and E is the number of dependencies.
+
+## Implementation Examples
+
+### Task Definition
+
+```typescript
+interface Task {
+  id: string;
+  parameters?: any;
+  action: () => Promise<any> | any;
+  artifact?: any;
+  dependencies?: string[];
+}
+```
+
+### Dependency Graph Construction
+
+```typescript
+const tasks: Task[] = [taskA, taskB, taskC];
+
+const taskMap = new Map<string, Task>();
+tasks.forEach((task) => taskMap.set(task.id, task));
+
+const adjacencyList = new Map<string, string[]>();
+
+tasks.forEach((task) => {
+  if (!adjacencyList.has(task.id)) {
+    adjacencyList.set(task.id, []);
+  }
+  if (task.dependencies) {
+    task.dependencies.forEach((dep) => {
+      if (!adjacencyList.has(dep)) {
+        adjacencyList.set(dep, []);
+      }
+      adjacencyList.get(dep)!.push(task.id);
+    });
+  }
+});
+```
+
+### Execution Engine
+
+```typescript
+async function executeTasks(tasks: Task[]) {
+  const executed = new Set<string>();
+
+  async function executeTask(taskId: string): Promise<any> {
+    if (executed.has(taskId)) return;
+
+    const task = taskMap.get(taskId)!;
+
+    // Execute dependencies first
+    if (task.dependencies) {
+      for (const depId of task.dependencies) {
+        await executeTask(depId);
+      }
+    }
+
+    // Prepare parameters if needed
+    let params = undefined;
+    if (task.dependencies && task.dependencies.length > 0) {
+      params = task.dependencies.map((depId) => taskMap.get(depId)!.artifact);
+    }
+
+    // Execute the task action
+    const result = await task.action(...(params || []));
+    task.artifact = result;
+    executed.add(taskId);
+  }
+
+  // Start execution from tasks with no dependencies
+  for (const task of tasks) {
+    await executeTask(task.id);
+  }
+}
+
+// Run the execution engine
+executeTasks(tasks).then(() => {
+  console.log("All tasks executed.");
+});
+```
 
 ## Contributing
 
