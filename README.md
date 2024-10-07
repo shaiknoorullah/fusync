@@ -29,6 +29,7 @@ A powerful library for managing and executing complex sequences of asynchronous 
     - [Task Dependencies](#task-dependencies)
     - [Sequences and Layers](#sequences-and-layers)
     - [Algorithm Overview](#algorithm-overview)
+    - [Execution Strategy](#execution-strategy)
     - [Complexity Analysis](#complexity-analysis)
 14. [Implementation Examples](#implementation-examples)
 15. [Contributing](#contributing)
@@ -314,12 +315,32 @@ Tasks may have dependencies based on their parameters and the variables they mod
 
 1. **Task Representation**: Each task is an object with an ID, parameters, action, artifact, and dependencies.
 2. **Dependency Graph Construction**: Use a Directed Acyclic Graph (DAG) to model task dependencies.
-3. **Execution Strategy**: 
-   - Identify independent tasks
-   - Form layers and queues
-   - Enable concurrency
-   - Ensure correctness
-   - Optimize resource usage
+3. **Topological Sorting**: Order tasks based on their dependencies to ensure correct execution order.
+4. **Layer and Queue Formation**: Group tasks into layers and queues based on their dependencies and execution requirements.
+5. **Concurrent Execution**: Execute independent tasks and queues concurrently while respecting dependencies.
+
+### Execution Strategy
+
+1. **Identify Tasks and Dependencies**:
+   - Analyze each task's parameters and variables to determine dependencies.
+   - Create a dependency list for each task.
+
+2. **Build Dependency Graph**:
+   - Create nodes for all tasks.
+   - Add directed edges from each task to its dependencies.
+
+3. **Form Queues**:
+   - Perform topological sorting on the DAG.
+   - Identify linear paths (chains of dependent tasks) and group them into queues.
+   - Assign depth levels to tasks based on their distance from root tasks.
+
+4. **Execute Tasks**:
+   - Start with tasks that have no dependencies.
+   - Execute tasks in each queue sequentially.
+   - Run independent queues concurrently.
+   - Before executing a task, ensure all its dependencies are completed.
+   - Utilize asynchronous programming constructs for concurrent execution.
+   - Implement synchronization mechanisms (e.g., awaiting promises, event emitters) to coordinate task execution.
 
 ### Complexity Analysis
 
