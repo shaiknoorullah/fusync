@@ -1,3 +1,5 @@
+<!-- @format -->
+
 # Task Execution System: Definitions and Concepts
 
 ## Table of Contents
@@ -86,6 +88,7 @@
 In modern software development, particularly within **microservices** and **asynchronous event-driven architectures**, managing tasks with complex dependencies is essential for ensuring **system efficiency** and **reliability**. Systems today often need to handle both **synchronous** and **asynchronous tasks**, which may have intricate dependency chains. Successfully managing these tasks while optimizing their execution requires a well-thought-out strategy. This document introduces the **foundational concepts** of a **task execution system** designed to handle these complexities.
 
 The task execution system outlined in this document focuses on:
+
 - Handling tasks with varying degrees of dependency.
 - Balancing execution strategies between synchronous and asynchronous tasks.
 - Ensuring tasks are executed in the correct sequence while maximizing concurrency when possible.
@@ -141,7 +144,7 @@ Synchronous tasks are executed in a sequential manner. Each task must complete i
 
 ```typescript
 function calculateSum(a: number, b: number): number {
-  return a + b;
+	return a + b
 }
 ```
 
@@ -153,8 +156,8 @@ Asynchronous tasks are executed independently of the main execution flow, allowi
 
 ```typescript
 async function fetchUserData(userId: string): Promise<UserData> {
-  const response = await fetch(`/api/users/${userId}`);
-  return await response.json();
+	const response = await fetch(`/api/users/${userId}`)
+	return await response.json()
 }
 ```
 
@@ -242,7 +245,7 @@ After **Task A** is executed:
 
 # Task Execution Algorithm and Complexity Analysis
 
-
+![alt text](preview.webp)
 
 ## Algorithm Overview
 
@@ -396,19 +399,23 @@ Let:
 #### Building the Dependency Graph
 
 - **Process**:
+
   - Iterate over each task to identify dependencies.
   - For each task \( T_i \), we may check all other tasks to determine dependencies based on shared variables or artifacts.
 
 - **Worst-Case Analysis**:
+
   - **Dependency Identification**:
     - If dependency analysis requires comparing each task with every other task, the time complexity is \( O(V^2) \).
     - However, if dependencies are explicitly specified or can be determined in \( O(1) \) time per task, this reduces to \( O(V) \).
 
 - **Adding Edges**:
+
   - For each task \( T_i \) with \( k \) dependencies, we add \( k \) edges.
   - Total number of edges \( E \) is the sum of dependencies across all tasks.
 
 - **Total Time Complexity**:
+
   - **Best Case**: \( O(V) \) (if dependencies are given).
   - **Worst Case**: \( O(V^2) \) (if dependencies need to be computed via pairwise comparisons).
 
@@ -421,7 +428,9 @@ Let:
 - **Algorithm Used**: Kahn's Algorithm or Depth-First Search (DFS)-based topological sort.
 
 - **Time Complexity**:
+
   - Kahn's Algorithm:
+
     - Initialize in-degree for each vertex: \( O(V) \).
     - Process vertices:
       - Each vertex is enqueued and dequeued exactly once: \( O(V) \).
@@ -436,9 +445,11 @@ Let:
 #### Queue Formation
 
 - **Process**:
+
   - After topological sorting, tasks are grouped into queues based on their dependencies.
 
 - **Time Complexity**:
+
   - Assigning depth levels:
     - Traverse each task and its dependencies to assign depth levels: \( O(V + E) \).
   - Grouping tasks into queues:
@@ -450,10 +461,12 @@ Let:
 #### Task Execution
 
 - **Sequential Tasks within Queues**:
+
   - Time depends on individual task execution times.
-  - Let \( T_{seq} = \sum_{i=1}^{n} t_i \) for tasks in a queue, where \( t_i \) is the execution time of task \( T_i \).
+  - Let \( T*{seq} = \sum*{i=1}^{n} t_i \) for tasks in a queue, where \( t_i \) is the execution time of task \( T_i \).
 
 - **Concurrent Queues**:
+
   - Total execution time is determined by the longest queue (critical path).
 
 - **Overall Execution Time**:
@@ -466,9 +479,11 @@ Let:
 #### Graph Storage
 
 - **Nodes**:
+
   - Store \( V \) nodes: \( O(V) \).
 
 - **Edges**:
+
   - Each edge represents a dependency.
   - Store \( E \) edges: \( O(E) \).
 
@@ -479,15 +494,19 @@ Let:
 #### Auxiliary Data Structures
 
 - **In-degree Array** (for Kahn's Algorithm):
+
   - Stores in-degree for each node: \( O(V) \).
 
 - **Queue for Topological Sort**:
+
   - Maximum size is \( O(V) \).
 
 - **Depth Levels Mapping**:
+
   - Stores depth level for each task: \( O(V) \).
 
 - **Visited Set or Stack** (for DFS):
+
   - Maximum size is \( O(V) \).
 
 - **Total Space Complexity**:
@@ -496,6 +515,7 @@ Let:
 ### Summary of Complexities
 
 - **Time Complexity**:
+
   - **Building Dependency Graph**: \( O(V + E) \) when dependencies are given; up to \( O(V^2) \) if dependencies need to be computed.
   - **Topological Sorting**: \( O(V + E) \).
   - **Queue Formation**: \( O(V + E) \).
@@ -547,7 +567,6 @@ Refer to the DAG in the [Form Queues](#3-form-queues) section.
 The proposed algorithm efficiently executes tasks by respecting dependencies and maximizing concurrency where possible. By constructing a dependency graph and forming queues, we can identify opportunities for parallel execution, reducing total execution time. The time complexity of the algorithm is linear with respect to the number of tasks and dependencies when dependencies are explicitly provided. The space complexity is also linear, making the algorithm suitable for large-scale systems.
 
 # Examples of Implementation
-
 
 ## Components of the System
 
@@ -621,11 +640,11 @@ Queues are used to manage task execution order.
 
 ```typescript
 interface Task {
-  id: string;
-  parameters?: any;
-  action: () => Promise<any> | any;
-  artifact?: any;
-  dependencies?: string[];
+	id: string
+	parameters?: any
+	action: () => Promise<any> | any
+	artifact?: any
+	dependencies?: string[]
 }
 ```
 
@@ -658,6 +677,7 @@ graph TD;
 ### Queue Formation and Execution
 
 - **Queues**:
+
   - **Queue 1**: A → B → C
   - **Queue 2**: A → D
 
@@ -672,11 +692,11 @@ graph TD;
 
 ```typescript
 interface Task {
-  id: string;
-  parameters?: any;
-  action: () => Promise<any> | any;
-  artifact?: any;
-  dependencies?: string[];
+	id: string
+	parameters?: any
+	action: () => Promise<any> | any
+	artifact?: any
+	dependencies?: string[]
 }
 ```
 
@@ -686,105 +706,105 @@ interface Task {
 
 ```typescript
 const taskA: Task = {
-  id: "A",
-  action: () => {
-    console.log("Executing Task A");
-    return "Result from Task A";
-  },
-};
+	id: "A",
+	action: () => {
+		console.log("Executing Task A")
+		return "Result from Task A"
+	},
+}
 ```
 
 #### Task B: Depends on Task A
 
 ```typescript
 const taskB: Task = {
-  id: "B",
-  dependencies: ["A"],
-  action: (artifactFromA: any) => {
-    console.log("Executing Task B with", artifactFromA);
-    return `Result from Task B using ${artifactFromA}`;
-  },
-};
+	id: "B",
+	dependencies: ["A"],
+	action: (artifactFromA: any) => {
+		console.log("Executing Task B with", artifactFromA)
+		return `Result from Task B using ${artifactFromA}`
+	},
+}
 ```
 
 #### Task C: Depends on Task B
 
 ```typescript
 const taskC: Task = {
-  id: "C",
-  dependencies: ["B"],
-  action: (artifactFromB: any) => {
-    console.log("Executing Task C with", artifactFromB);
-    return `Result from Task C using ${artifactFromB}`;
-  },
-};
+	id: "C",
+	dependencies: ["B"],
+	action: (artifactFromB: any) => {
+		console.log("Executing Task C with", artifactFromB)
+		return `Result from Task C using ${artifactFromB}`
+	},
+}
 ```
 
 ### Dependency Graph Construction
 
 ```typescript
-const tasks: Task[] = [taskA, taskB, taskC];
+const tasks: Task[] = [taskA, taskB, taskC]
 
-const taskMap = new Map<string, Task>();
-tasks.forEach((task) => taskMap.set(task.id, task));
+const taskMap = new Map<string, Task>()
+tasks.forEach(task => taskMap.set(task.id, task))
 
-const adjacencyList = new Map<string, string[]>();
+const adjacencyList = new Map<string, string[]>()
 
-tasks.forEach((task) => {
-  if (!adjacencyList.has(task.id)) {
-    adjacencyList.set(task.id, []);
-  }
-  if (task.dependencies) {
-    task.dependencies.forEach((dep) => {
-      if (!adjacencyList.has(dep)) {
-        adjacencyList.set(dep, []);
-      }
-      adjacencyList.get(dep)!.push(task.id);
-    });
-  }
-});
+tasks.forEach(task => {
+	if (!adjacencyList.has(task.id)) {
+		adjacencyList.set(task.id, [])
+	}
+	if (task.dependencies) {
+		task.dependencies.forEach(dep => {
+			if (!adjacencyList.has(dep)) {
+				adjacencyList.set(dep, [])
+			}
+			adjacencyList.get(dep)!.push(task.id)
+		})
+	}
+})
 ```
 
 ### Execution Engine
 
 ```typescript
 async function executeTasks(tasks: Task[]) {
-  const executed = new Set<string>();
+	const executed = new Set<string>()
 
-  async function executeTask(taskId: string): Promise<any> {
-    if (executed.has(taskId)) return;
+	async function executeTask(taskId: string): Promise<any> {
+		if (executed.has(taskId)) return
 
-    const task = taskMap.get(taskId)!;
+		const task = taskMap.get(taskId)!
 
-    // Execute dependencies first
-    if (task.dependencies) {
-      for (const depId of task.dependencies) {
-        await executeTask(depId);
-      }
-    }
+		// Execute dependencies first
+		if (task.dependencies) {
+			for (const depId of task.dependencies) {
+				await executeTask(depId)
+			}
+		}
 
-    // Prepare parameters if needed
-    let params = undefined;
-    if (task.dependencies && task.dependencies.length > 0) {
-      params = task.dependencies.map((depId) => taskMap.get(depId)!.artifact);
-    }
+		// Prepare parameters if needed
+		let params = undefined
+		if (task.dependencies && task.dependencies.length > 0) {
+			params = task.dependencies.map(depId => taskMap.get(depId)!.artifact)
+		}
 
-    // Execute the task action
-    const result = await task.action(...(params || []));
-    task.artifact = result;
-    executed.add(taskId);
-  }
+		// Execute the task action
+		const result = await task.action(...(params || []))
+		task.artifact = result
+		executed.add(taskId)
+	}
 
-  // Start execution from tasks with no dependencies
-  for (const task of tasks) {
-    await executeTask(task.id);
-  }
+	// Start execution from tasks with no dependencies
+	for (const task of tasks) {
+		await executeTask(task.id)
+	}
 }
 
 // Run the execution engine
 executeTasks(tasks).then(() => {
-  console.log("All tasks executed.");
-});
+	console.log("All tasks executed.")
+})
 ```
 
 **Explanation**:
