@@ -14,6 +14,7 @@
     - [Artifact](#artifact)
   - [Types of Tasks](#types-of-tasks)
     - [Synchronous Tasks](#synchronous-tasks)
+      	- TODO: types of synchronous-tasks: void (no output means only computes and interacts with some entity but doesn't have to return any data)
     - [Asynchronous Tasks](#asynchronous-tasks)
   - [Task Dependencies](#task-dependencies)
     - [Dependency Rules](#dependency-rules)
